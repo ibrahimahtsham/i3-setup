@@ -29,7 +29,8 @@ Download Ubuntu Server (minimal base for i3 setup):
 Flash the ISO to USB (with Balena Etcher or `dd`), then boot your Chromebook (requires Developer Mode + MrChromebox UEFI firmware).
 
 ## 📂 Repo Structure
-dotfiles-i3/
+```text
+i3-setup/
 │── setup.sh           -> Main setup script (symlinks + installs deps)
 │── configs/
 │   ├── i3/config      -> i3 WM config
@@ -37,23 +38,34 @@ dotfiles-i3/
 │   └── scripts/       -> helper scripts (audio fix, shortcut guide)
 │
 └── README.md          -> this file
+```
 
 ## ⚡ Quick Start
+
+
 Clone repo:
-    git clone https://github.com/YOURUSERNAME/dotfiles-i3.git ~/dotfiles-i3
-    cd ~/dotfiles-i3
+```bash
+git clone https://github.com/ibrahiahtsham/i3-setup.git ~/i3-setup
+cd ~/i3-setup
+```
+
 
 Run setup:
-    chmod +x setup.sh
-    ./setup.sh
+```bash
+chmod +x setup.sh
+./setup.sh
+```
 
 Reboot and you’re ready 🎉
 
 ## 🔹 Step 4: Install i3
 After installing Ubuntu Server and logging in:
 
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install i3 rofi i3blocks flatpak gnome-software -y
+
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install i3 rofi i3blocks flatpak gnome-software -y
+```
 
 ## 📝 Notes
 - Everything is managed via GitHub → edit configs only inside this repo
