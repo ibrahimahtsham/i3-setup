@@ -17,10 +17,10 @@ mute=$(pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null | awk '{print $2}')
 
 [ -z "$vol" ] && vol="--"
 
-icon_span="<span font='FontAwesome'></span>"
-color="#50fa7b"
+icon_span="<span font='FontAwesome 9'></span>"
+color="#FFFFFF"
 if [ "$mute" = "yes" ]; then
-  icon_span="<span font='FontAwesome'></span>"
+  icon_span="<span font='FontAwesome 9'></span>"
   color="#ff5555"
 fi
 

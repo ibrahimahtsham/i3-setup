@@ -2,7 +2,7 @@
 # i3blocks brightness widget: shows % and supports scroll to change
 # Uses brightnessctl if available; falls back to sysfs for read-only display
 
-ICON_SPAN="<span font='FontAwesome'></span>"
+ICON_SPAN="<span font='FontAwesome 9'></span>"
 STEP="5%"
 
 has_bctl=0
@@ -54,7 +54,7 @@ echo
 if [ "$pct" -lt 25 ]; then
   echo "#ff5555"
 elif [ "$pct" -lt 60 ]; then
-  echo "#f1fa8c"
+  echo "#FFFFFF"
 else
-  echo "#50fa7b"
+  echo "#FFFFFF"
 fi

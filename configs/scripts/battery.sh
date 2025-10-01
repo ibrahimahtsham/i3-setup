@@ -13,15 +13,15 @@ cap=$(cat "$BAT_PATH/capacity" 2>/dev/null || echo 0)
 stat=$(cat "$BAT_PATH/status" 2>/dev/null || echo "Unknown")
 
 # Pick icon based on capacity
-icon="<span font='FontAwesome'></span>" # 0-10%
-if [ "$cap" -ge 90 ]; then icon="<span font='FontAwesome'></span>"; fi
-if [ "$cap" -lt 90 ] && [ "$cap" -ge 70 ]; then icon="<span font='FontAwesome'></span>"; fi
-if [ "$cap" -lt 70 ] && [ "$cap" -ge 45 ]; then icon="<span font='FontAwesome'></span>"; fi
-if [ "$cap" -lt 45 ] && [ "$cap" -ge 20 ]; then icon="<span font='FontAwesome'></span>"; fi
+icon="<span font='FontAwesome 9'></span>" # 0-10%
+if [ "$cap" -ge 90 ]; then icon="<span font='FontAwesome 9'></span>"; fi
+if [ "$cap" -lt 90 ] && [ "$cap" -ge 70 ]; then icon="<span font='FontAwesome 9'></span>"; fi
+if [ "$cap" -lt 70 ] && [ "$cap" -ge 45 ]; then icon="<span font='FontAwesome 9'></span>"; fi
+if [ "$cap" -lt 45 ] && [ "$cap" -ge 20 ]; then icon="<span font='FontAwesome 9'></span>"; fi
 
 # If charging, show bolt in front
 if [ "$stat" = "Charging" ]; then
-  icon="<span font='FontAwesome'></span> $icon"
+  icon="<span font='FontAwesome 9'></span> $icon"
 fi
 
 # Color by level
