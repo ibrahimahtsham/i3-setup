@@ -71,3 +71,17 @@ sudo apt install i3 rofi i3blocks flatpak gnome-software -y
 - Everything is managed via GitHub → edit configs only inside this repo
 - Reinstalling on a new machine? Just clone and run setup.sh
 - Scripts in configs/scripts/ will handle Chromebook-specific quirks (like audio)
+
+## 🧩 i3blocks: Icons, Karachi Time, Brightness
+- Status bar now uses emoji icons (no extra fonts needed)
+- Karachi time is shown with TZ=Asia/Karachi
+- Brightness block supports scroll to change (requires `brightnessctl`)
+  - Scroll up/down over the block to adjust
+  - Left click: set 50%, Right click: 100%
+  - If `brightnessctl` isn’t installed, it will show level but won’t change
+
+If you don’t see brightness changing, add your user to the video group and relogin:
+
+```bash
+sudo usermod -aG video "$USER"
+```
