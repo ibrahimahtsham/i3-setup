@@ -22,6 +22,12 @@ Extras:
 - Scripts for Chromebook audio fixes & autostart helpers
 - Shortcut guide that runs on login
 
+## 📥 Get the ISO
+Download Ubuntu Server (minimal base for i3 setup):  
+👉 https://ubuntu.com/download/server
+
+Flash the ISO to USB (with Balena Etcher or `dd`), then boot your Chromebook (requires Developer Mode + MrChromebox UEFI firmware).
+
 ## 📂 Repo Structure
 dotfiles-i3/
 │── setup.sh           -> Main setup script (symlinks + installs deps)
@@ -42,6 +48,12 @@ Run setup:
     ./setup.sh
 
 Reboot and you’re ready 🎉
+
+## 🔹 Step 4: Install i3
+After installing Ubuntu Server and logging in:
+
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install i3 rofi i3blocks flatpak gnome-software -y
 
 ## 📝 Notes
 - Everything is managed via GitHub → edit configs only inside this repo
