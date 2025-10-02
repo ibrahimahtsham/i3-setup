@@ -2,58 +2,71 @@
 general {
     colors = true
     interval = 1
-    color_good = "#a3be8c"
-    color_degraded = "#ebcb8b"
-    color_bad = "#bf616a"
+    color_good = "#00ff00"
+    color_bad = "#ff0000"
+    output_format = "i3bar"
 }
 
+# Requested order:
+# brightness, volume, battery, wifi, cpu usage, gpu usage, ram usage, temp, time
+order += "read_file brightness"
+order += "read_file volume_placeholder"
+order += "battery BAT0"
 order += "wireless _first_"
-order += "battery all"
-order += "volume master"
-order += "disk /"
-order += "memory"
 order += "cpu_usage"
-order += "load"
+order += "read_file gpu_placeholder"
+order += "memory"
+order += "cpu_temperature 6"
 order += "tztime local"
 
 wireless _first_ {
-    format_up = "W: %quality %essid %ip"
-    format_down = "W: down"
+    # Wi label + connection state; colors from color_good/color_bad
+    format_up = "Wi: CON"
+    format_down = "Wi: DIS"
 }
 
-battery all {
-    format = "BAT: %percentage %remaining"
+battery BAT0 {
+    format = "BAT: %percentage"
     format_down = "BAT: n/a"
     last_full_capacity = true
     integer_battery_capacity = true
     low_threshold = 15
 }
 
-volume master {
-    format = "VOL: %volume"
-    device = "default"
-    mixer = "Master"
-    mixer_idx = 0
-}
-
-disk "/" {
-    format = "SSD: %avail"
+read_file volume_placeholder {
+    path = "/proc/asound/cards"
+    format = "V: n/a"
 }
 
 memory {
-    format = "RAM: %used (%available)"
+    # R for RAM
+    format = "R: %used"
     threshold_degraded = "10%"
-    format_degraded = "RAM: %used"
+    format_degraded = "R: %used"
 }
 
 cpu_usage {
-    format = "CPU: %usage%%"
+    # C for CPU
+    format = "C: %usage"
 }
 
-load {
-    format = "LD: %1min"
+# T for Temperature (CPU). Adjust index (0/1/...) if needed for your system.
+cpu_temperature 6 {
+    format = "T: %degrees°C"
 }
 
-tztime local {
-    format = "%a %b %d %H:%M"
+# B for Brightness (raw value from sysfs). Replace path with your backlight device.
+read_file brightness {
+    path = "/sys/class/backlight/intel_backlight/brightness"
+    format = "BRI: %content/19200"
+}
+
+// GPU removed (no sysfs metric available on this system)
+read_file gpu_placeholder {
+    path = "/proc/uptime"
+    format = "G: n/a"
+}
+
+ tztime local {
+    format = "%a %-d %b %Y %-I:%M:%S%p"
 }
