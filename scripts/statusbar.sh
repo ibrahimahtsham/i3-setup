@@ -8,6 +8,71 @@ COLOR_GOOD="#00ff00"
 COLOR_DEG="#ffcc00"
 COLOR_BAD="#ff0000"
 
+# Color helpers
+# - Prefer coloring only when attention is needed (warn/alert)
+# - Neutral/healthy values are left uncolored for a cleaner bar
+percent_from_text() {
+  # Extract first integer percentage in a string like "C: 23%" -> 23
+  echo "$1" | sed -n 's/.*\([0-9]\+\)%.*/\1/p'
+}
+
+temp_from_text() {
+  # Extract integer from "T: 52°C" -> 52
+  echo "$1" | sed -n 's/.*\([0-9]\+\)°C.*/\1/p'
+}
+
+color_percent_warn() {
+  # Input text containing a percent; warn >=50, bad >=75
+  # Returns a color or empty string
+  local p
+  p=$(percent_from_text "$1")
+  if [ -n "$p" ]; then
+    if [ "$p" -ge 75 ]; then echo "$COLOR_BAD"; return; fi
+    if [ "$p" -ge 50 ]; then echo "$COLOR_DEG"; return; fi
+  fi
+  echo ""
+}
+
+color_temp_warn() {
+  # Warn >=70°C, bad >=85°C
+  local t
+  t=$(temp_from_text "$1")
+  if [ -n "$t" ]; then
+    if [ "$t" -ge 85 ]; then echo "$COLOR_BAD"; return; fi
+    if [ "$t" -ge 70 ]; then echo "$COLOR_DEG"; return; fi
+  fi
+  echo ""
+}
+
+color_battery() {
+  # Low battery: bad <=20%, warn <=40%
+  local p
+  p=$(percent_from_text "$1")
+  if [ -n "$p" ]; then
+    if [ "$p" -le 20 ]; then echo "$COLOR_BAD"; return; fi
+    if [ "$p" -le 40 ]; then echo "$COLOR_DEG"; return; fi
+  fi
+  echo ""
+}
+
+color_wifi() {
+  # DIS -> bad; CON -> no color
+  case "$1" in
+    *DIS*) echo "$COLOR_BAD" ;;
+    *) echo "" ;;
+  esac
+}
+
+# JSON printer with optional color
+print_block() {
+  # $1=name, $2=text, $3=color(optional)
+  if [ -n "${3:-}" ]; then
+    printf '{"name":"%s","full_text":"%s","color":"%s"}' "$1" "$2" "$3"
+  else
+    printf '{"name":"%s","full_text":"%s"}' "$1" "$2"
+  fi
+}
+
 # Optional debug for click events: export STATUSBAR_DEBUG=1 to log events to /tmp/statusbar-clicks.log
 DEBUG_CLICK="${STATUSBAR_DEBUG:-}"
 DEBUG_LOG="/tmp/statusbar-clicks.log"
@@ -282,19 +347,35 @@ while sleep 1; do
   temp=$(read_temp)
   now=$(read_time)
 
-  # Build JSON array with colors
+  # Build JSON array with cleaner color policy (warn/alert only)
   printf ',['
-  printf '{"name":"bri","full_text":"%s","color":"%s"},' "$bri" "$COLOR_GOOD"
-  printf '{"name":"vol","full_text":"%s","color":"%s"},' "$vol" "$COLOR_GOOD"
-  printf '{"name":"bat","full_text":"%s"},' "$bat"
-  # Wi-Fi color by state
-  if echo "$wifi" | grep -q 'CON'; then wcolor=$COLOR_GOOD; else wcolor=$COLOR_BAD; fi
-  printf '{"name":"wifi","full_text":"%s","color":"%s"},' "$wifi" "$wcolor"
-  printf '{"name":"cpu","full_text":"%s"},' "$cpu"
-  printf '{"name":"gpu","full_text":"%s"},' "$gpu"
-  printf '{"name":"ram","full_text":"%s"},' "$ram"
-  printf '{"name":"temp","full_text":"%s"},' "$temp"
-  printf '{"name":"time","full_text":"%s"}' "$now"
+
+  # Brightness: neutral (no color)
+  print_block "bri" "$bri" ""; printf ','
+
+  # Volume: neutral (colorize only if unavailable)
+  vcolor=""; case "$vol" in *n/a*) vcolor=$COLOR_BAD ;; esac
+  print_block "vol" "$vol" "$vcolor"; printf ','
+
+  # Battery: warn/alert by level
+  print_block "bat" "$bat" "$(color_battery "$bat")"; printf ','
+
+  # Wi-Fi: color on disconnect
+  print_block "wifi" "$wifi" "$(color_wifi "$wifi")"; printf ','
+
+  # CPU and GPU: color when busy
+  print_block "cpu" "$cpu" "$(color_percent_warn "$cpu")"; printf ','
+  print_block "gpu" "$gpu" "$(color_percent_warn "$gpu")"; printf ','
+
+  # RAM: neutral numeric (GiB used)
+  print_block "ram" "$ram" ""; printf ','
+
+  # Temp: warn/alert when hot
+  print_block "temp" "$temp" "$(color_temp_warn "$temp")"; printf ','
+
+  # Time: neutral
+  print_block "time" "$now" ""
+
   printf ']\n'
 
 done
