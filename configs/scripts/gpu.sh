@@ -2,7 +2,7 @@
 # i3blocks GPU usage widget
 # Tries Intel i915 gt_busy_percent via sysfs, then intel_gpu_top JSON
 
-ICON="<span font='FontAwesome 13'></span>"
+ICON="<span font='FontAwesome'></span>"
 VAL="--"
 
 # Prefer sysfs (Intel: gt_busy_percent; AMD: gpu_busy_percent)

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # i3blocks CPU usage widget: averages usage across all cores
 
-ICON="<span font='FontAwesome 13'></span>"
+ICON="<span font='FontAwesome'></span>"
 STATE_FILE="/tmp/i3blocks_cpu_prev"
 
 read -r TOTAL IDLE <<< "$(awk '/^cpu /{idle=$5+$6; for(i=2;i<=NF;i++) s+=$i; print s, idle}' /proc/stat)"

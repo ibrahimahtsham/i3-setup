@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # i3blocks CPU temperature widget: reads from thermal zones, falls back to sensors
 
-ICON="<span font='FontAwesome 13'></span>"
+ICON="<span font='FontAwesome'></span>"
 BEST=-1000000
 
 choose() {

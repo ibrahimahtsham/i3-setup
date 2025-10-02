@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # i3blocks RAM usage widget: percentage based on MemAvailable
 
-ICON="<span font='FontAwesome 13'></span>"
+ICON="<span font='FontAwesome'></span>"
 
 read -r TOTAL AVAIL <<< "$(awk '
 /^MemTotal:/ {t=$2}
