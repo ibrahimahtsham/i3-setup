@@ -15,7 +15,7 @@ Setup (seamless)
 1) Install core + audio/brightness packages
 ```bash
 sudo apt update
-sudo apt install -y --no-install-recommends xorg xinit i3-wm dmenu kitty dbus-x11 policykit-1
+sudo apt install -y --no-install-recommends xorg xinit i3-wm dmenu kitty dbus-x11 policykit-1 vim
 sudo apt install -y brightnessctl pipewire wireplumber pipewire-audio-client-libraries pulseaudio-utils alsa-utils alsa-ucm-conf
 ```
 
