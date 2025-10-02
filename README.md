@@ -37,29 +37,4 @@ exec i3
 startx
 ```
 
-Notes
-- Status bar blocks: BRI (brightness), V (volume), BAT, Wi, CPU, GPU, RAM, T (temp), time.
-- Mouse scroll over BRI/V adjusts brightness/volume in 5% steps.
-  
-
-Troubleshooting audio
-- If wpctl status shows “Dummy Output” only:
-	```bash
-	sudo apt install -y alsa-ucm-conf alsa-utils
-	systemctl --user restart pipewire wireplumber
-	```
-- Pick the right default sink (speaker/headphones/HDMI):
-	```bash
-	wpctl status   # note the sink ID, e.g., 59 for Speaker
-	wpctl set-default 59
-	wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
-	wpctl set-volume @DEFAULT_AUDIO_SINK@ 50%
-	./scripts/test_audio.sh
-	```
-
-Troubleshooting brightness
-- brightnessctl should work without root; if it doesn’t:
-	- Ensure you’re in the video group (id -nG | grep -qw video) and re-login after adding.
-	- Some devices expose multiple backlights; the script auto-picks the first. Open an issue if you need a specific one targeted.
-
 Specs (Chromebook): 4GB RAM • 32GB eMMC • Intel Celeron N4000
