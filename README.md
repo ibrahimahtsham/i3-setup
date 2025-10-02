@@ -5,6 +5,7 @@ Goal
 - Only install exactly what’s needed; keep configs and scripts short
 - TTY login → startx → i3 with kitty; repeatable setup later via one‑shot
 - Apps via Flatpak (Firefox, Discord) and VS Code when ready; simple status bar
+ - Apps via Snap (Firefox, Discord) and VS Code when ready; simple status bar
 
 What you get (short)
 - TTY login, then startx into i3 (no display manager)
@@ -17,6 +18,9 @@ Setup (seamless)
 sudo apt update
 sudo apt install -y --no-install-recommends xorg xinit i3-wm dmenu kitty dbus-x11 policykit-1 vim
 sudo apt install -y brightnessctl pipewire wireplumber pipewire-audio-client-libraries pulseaudio-utils alsa-utils alsa-ucm-conf intel-gpu-tools
+# Apps via Snap (Firefox, Discord) — recommended on Ubuntu
+sudo apt install -y snapd && \
+sudo snap install firefox discord
 ```
 
 2) Add user to video/audio groups (brightness/devices)
