@@ -1,87 +1,44 @@
-# Chromebook i3 Setup 🚀
+# i3 Chromebook setup
 
-## 🖥 System Info
-- Device: Chromebook
-- CPU: Intel Celeron N4000 (dual-core @ 1.1GHz)
-- GPU: Intel UHD 600
-- RAM: 4GB
-- Storage: 32GB eMMC
+Minimal i3 setup for Chromebook (Intel UHD 600). Includes i3, rofi, i3blocks, and helper scripts.
 
-## 📦 What This Setup Installs
-- Ubuntu Minimal (lightweight base, stable & auto updates)
-- i3 Window Manager (tiling, fast, minimal)
-- Rofi (application launcher, replaces dmenu)
-- i3blocks (lightweight status bar for system info)
-- Flatpak (to install apps easily)
-- Apps:
-  - Firefox
-  - VS Code (official Microsoft build)
-  - Discord
+- Setup script: [setup.sh](setup.sh)
+- i3 config: [configs/i3/config](configs/i3/config)
+- i3blocks config: [configs/i3blocks.conf](configs/i3blocks.conf)
+- Scripts: [configs/scripts](configs/scripts)
 
-Extras:
-- Scripts for Chromebook audio fixes & autostart helpers
-- Shortcut guide that runs on login
+## What you get
+- i3 with sensible keybinds
+- i3blocks with: brightness, volume, battery, CPU/RAM/GPU usage, temp, network, local time
+- Chromebook helpers: audio fix, brightness via brightnessctl
 
-## 📥 Get the ISO
-Download Ubuntu Server (minimal base for i3 setup):  
-👉 https://ubuntu.com/download/server
+## Replicate this setup
+- Install base packages (Ubuntu/Debian example; use equivalents for Arch/Fedora):
+  - sudo apt update && sudo apt install -y i3 rofi i3blocks flatpak gnome-software
+- Clone and link configs:
+  - git clone https://github.com/ibrahiahtsham/i3-setup.git ~/i3-setup
+  - cd ~/i3-setup && chmod +x setup.sh && ./setup.sh
+- Optional: allow brightness control without root
+  - sudo usermod -aG video "$USER" && newgrp video
+- Start or restart i3
+  - Mod+Shift+r to reload i3 after running setup
 
-Flash the ISO to USB (with Balena Etcher or `dd`), then boot your Chromebook (requires Developer Mode + MrChromebox UEFI firmware).
+Note:
+- setup.sh will install brightnessctl if missing (apt/pacman/dnf).
+- For audio issues, try: [configs/scripts/audio-fix.sh](configs/scripts/audio-fix.sh)
+ - Timezone uses your system's local time. To auto-detect on Debian/Ubuntu: `sudo timedatectl set-ntp true && sudo timedatectl set-timezone $(curl -fsSL https://ipapi.co/timezone || echo Etc/UTC)`
 
-## 📂 Repo Structure
-```text
-i3-setup/
-│── setup.sh           -> Main setup script (symlinks + installs deps)
-│── configs/
-│   ├── i3/config      -> i3 WM config
-│   ├── i3blocks.conf  -> i3blocks status bar config
-│   └── scripts/       -> helper scripts (audio fix, shortcut guide)
-│
-└── README.md          -> this file
-```
+## i3 quick keys
+- Mod+Enter: terminal
+- Mod+d: dmenu (or install/use rofi)
+- Mod+h/v: split horiz/vert
+- Mod+f: fullscreen
+- Mod+Shift+q: close
+- Mod+1..9: workspaces
+- Mod+Shift+1..9: move to workspace
+- Mod+Shift+c/r: reload/restart i3
 
-## ⚡ Quick Start
-
-
-Clone repo:
-```bash
-git clone https://github.com/ibrahiahtsham/i3-setup.git ~/i3-setup
-cd ~/i3-setup
-```
-
-
-Run setup:
-```bash
-chmod +x setup.sh
-./setup.sh
-```
-
-Reboot and you’re ready 🎉
-
-## 🔹 Step 4: Install i3
-After installing Ubuntu Server and logging in:
-
-
-```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install i3 rofi i3blocks flatpak gnome-software -y
-```
-
-## 📝 Notes
-- Everything is managed via GitHub → edit configs only inside this repo
-- Reinstalling on a new machine? Just clone and run setup.sh
-- Scripts in configs/scripts/ will handle Chromebook-specific quirks (like audio)
-
-## 🧩 i3blocks: Icons, Karachi Time, Brightness
-- Status bar now uses emoji icons (no extra fonts needed)
-- Karachi time is shown with TZ=Asia/Karachi
-- Brightness block supports scroll to change (requires `brightnessctl`)
-  - Scroll up/down over the block to adjust
-  - Left click: set 50%, Right click: 100%
-  - If `brightnessctl` isn’t installed, it will show level but won’t change
-
-If you don’t see brightness changing, add your user to the video group and relogin:
-
-```bash
-sudo usermod -aG video "$USER"
-```
+## i3blocks usage
+- Brightness: scroll to change (needs brightnessctl) → [configs/scripts/brightness.sh](configs/scripts/brightness.sh)
+- Volume: scroll to change, click to mute → [configs/scripts/volume.sh](configs/scripts/volume.sh)
+- Other modules: [battery](configs/scripts/battery.sh), [cpu](configs/scripts/cpu.sh), [ram](configs/scripts/ram.sh), [gpu](configs/scripts/gpu.sh), [temp](configs/scripts/temp.sh), [network](configs/scripts/network.sh)
