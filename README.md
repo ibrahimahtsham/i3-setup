@@ -16,9 +16,6 @@ Setup (now)
 ```bash
 sudo apt update
 sudo apt install -y --no-install-recommends xorg xinit i3-wm dmenu kitty dbus-x11 policykit-1
-# Optional for brightness control and audio integration
-sudo apt install -y brightnessctl pulseaudio-utils || true
-sudo apt install -y pipewire wireplumber pipewire-audio-client-libraries || true
 ```
 
 2) Minimal ~/.xinitrc
