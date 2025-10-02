@@ -1,0 +1,7 @@
+# i3 top-level config that includes component files from this repo
+# This file is referenced by your ~/.config/i3/config stub
+
+# Load all component configs in numeric order
+include "/home/siamax/i3-setup/configs/i3/components/00_vars.conf"
+include "/home/siamax/i3-setup/configs/i3/components/10_keys.conf"
+include "/home/siamax/i3-setup/configs/i3/components/20_bar.conf"
