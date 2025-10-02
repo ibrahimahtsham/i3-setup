@@ -181,10 +181,15 @@ read_bat() {
   local p="/sys/class/power_supply" bat
   bat=$(ls -1 "$p" 2>/dev/null | grep -E '^BAT' | head -n1)
   if [ -n "$bat" ] && [ -r "$p/$bat/capacity" ]; then
-    local cap stat
+    local cap stat sgn
     cap=$(cat "$p/$bat/capacity")
     [ -r "$p/$bat/status" ] && stat=$(cat "$p/$bat/status") || stat=""
-    echo "BAT: ${cap}%"
+    case "$stat" in
+      *Charging*) sgn="+" ;;
+      *Discharging*) sgn="-" ;;
+      *) sgn="" ;;
+    esac
+    echo "BAT: ${sgn}${cap}%"
   else
     echo "BAT: n/a"
   fi
