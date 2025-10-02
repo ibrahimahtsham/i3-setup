@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Ultra-minimal sync: only create symlinks if they don't exist
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-mkdir -p "$HOME/.config/i3" "$HOME/.config/i3status"
+mkdir -p "$HOME/.config/i3"
 
 link_once() {
   local src="$1" dst="$2"
@@ -18,6 +18,10 @@ link_once() {
 }
 
 link_once "$ROOT/configs/i3/config" "$HOME/.config/i3/config"
-link_once "$ROOT/configs/i3status/config" "$HOME/.config/i3status/config"
 
-echo "Done. Edit files under $ROOT/configs/* and press Mod+Shift+R in i3 to apply."
+# Ensure custom status bar script is executable
+if [ -f "$ROOT/scripts/statusbar.sh" ]; then
+  chmod +x "$ROOT/scripts/statusbar.sh"
+fi
+
+echo "Done. i3bar uses $ROOT/scripts/statusbar.sh (no i3status). Press Mod+Shift+R in i3 to reload."

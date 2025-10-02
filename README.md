@@ -9,13 +9,16 @@ Goal
 What you get (short)
 - TTY login, then startx into i3 (no display manager)
 - Kitty as default terminal, clean/dark defaults (from this repo’s scripts later)
-- i3bar with battery/Wi‑Fi/volume/brightness/time/CPU/GPU/RAM + BT tray; scroll adjusts volume/brightness
+- i3bar via custom scripts/statusbar.sh (no i3status): BRI/V/BAT/Wi/CPU/GPU/RAM/T; scroll on BRI adjusts brightness
 
 Setup (now)
 1) Install core packages
 ```bash
 sudo apt update
-sudo apt install -y --no-install-recommends xorg xinit i3-wm dmenu i3status kitty dbus-x11 policykit-1
+sudo apt install -y --no-install-recommends xorg xinit i3-wm dmenu kitty dbus-x11 policykit-1
+# Optional for brightness control and audio integration
+sudo apt install -y brightnessctl pulseaudio-utils || true
+sudo apt install -y pipewire wireplumber pipewire-audio-client-libraries || true
 ```
 
 2) Minimal ~/.xinitrc
@@ -24,8 +27,9 @@ sudo apt install -y --no-install-recommends xorg xinit i3-wm dmenu i3status kitt
 exec i3
 ```
 
-3) Start i3
+3) Link configs and start i3
 ```bash
+./sync.sh
 startx
 ```
 
