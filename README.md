@@ -1,6 +1,6 @@
 # i3 Chromebook setup
 
-Minimal i3 setup for Chromebook (Intel UHD 600). Includes i3, rofi, i3blocks, and helper scripts.
+Minimal i3 setup for Chromebook (Intel UHD 600). Includes i3, rofi (app launcher), i3blocks, and helper scripts.
 
 - Setup script: [setup.sh](setup.sh)
 - i3 config: [configs/i3/config](configs/i3/config)
@@ -30,7 +30,9 @@ Note:
 
 ## i3 quick keys
 - Mod+Enter: terminal
-- Mod+d: dmenu (or install/use rofi)
+- Mod+d: rofi app launcher (drun). You can switch to dmenu if you prefer.
+ - Mod+d: rofi app launcher (drun). You can switch to dmenu if you prefer.
+ - Mod+p: rofi launcher with Flatpak-aware env (wrapper script)
 - Mod+h/v: split horiz/vert
 - Mod+f: fullscreen
 - Mod+Shift+q: close
