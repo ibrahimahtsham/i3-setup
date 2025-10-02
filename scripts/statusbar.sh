@@ -8,6 +8,16 @@ COLOR_GOOD="#00ff00"
 COLOR_DEG="#ffcc00"
 COLOR_BAD="#ff0000"
 
+# Optional debug for click events: export STATUSBAR_DEBUG=1 to log events to /tmp/statusbar-clicks.log
+DEBUG_CLICK="${STATUSBAR_DEBUG:-}"
+DEBUG_LOG="/tmp/statusbar-clicks.log"
+
+log_dbg() {
+  if [ -n "$DEBUG_CLICK" ]; then
+    printf '%s\n' "$*" >> "$DEBUG_LOG" 2>/dev/null || true
+  fi
+}
+
 read_bri() {
   local b="/sys/class/backlight" dev raw max pct
   if [ -d "$b" ]; then
@@ -27,14 +37,11 @@ read_bri() {
 # Adjust brightness by +/- percentage using brightnessctl if present, else sysfs
 adj_bri_pct() {
   local delta="$1" # e.g., +5 or -5 (percent)
+  local abs op
+  abs="${delta#[-+]}"; op="+"; [ "${delta#-}" != "$delta" ] && op="-"
   if command -v brightnessctl >/dev/null 2>&1; then
-    # brightnessctl understands e.g., 5%+ or 5%-
-    if [ "${delta#-}" != "$delta" ]; then
-      brightnessctl -q set "${delta#-}%-" >/dev/null 2>&1 || true
-    else
-      brightnessctl -q set "${delta}%+" >/dev/null 2>&1 || true
-    fi
-    return
+    log_dbg "BRI using brightnessctl: ${abs}%${op}"
+    if brightnessctl -q set "${abs}%${op}" >/dev/null 2>&1; then return; fi
   fi
   # Fallback to sysfs write (may require permissions)
   local b="/sys/class/backlight" dev raw max new
@@ -51,6 +58,7 @@ adj_bri_pct() {
       fi
       if [ $new -lt 1 ]; then new=1; fi
       if [ $new -gt $max ]; then new=$max; fi
+      log_dbg "BRI using sysfs: new=$new (max=$max)"
       echo "$new" > "$b/$dev/brightness" 2>/dev/null || true
     fi
   fi
@@ -60,8 +68,8 @@ read_vol() {
   if command -v wpctl >/dev/null 2>&1; then
     # PipeWire
     local p
-    p=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{print $2*100}' | cut -d. -f1)
-    [ -n "$p" ] && echo "V: ${p}%" && return
+    p=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{print int($2*100)}')
+    if [ -n "${p:-}" ]; then echo "V: ${p}%"; return; fi
   elif command -v pactl >/dev/null 2>&1; then
     # PulseAudio
     local s p
@@ -74,6 +82,34 @@ read_vol() {
     [ -n "$p" ] && echo "V: ${p}" && return
   fi
   echo "V: n/a"
+}
+
+# Adjust volume by +/- percentage using wpctl, pactl, or amixer
+adj_vol_pct() {
+  local delta="$1"   # e.g., +5 or -5
+  local abs op
+  abs="${delta#[-+]}"
+  op="+"; [ "${delta#-}" != "$delta" ] && op="-"
+
+  if command -v wpctl >/dev/null 2>&1; then
+    # wpctl needs "5%+" or "5%-"; unmute when increasing
+    log_dbg "VOL using wpctl: ${abs}%${op}"
+    if [ "$op" = "+" ]; then wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 >/dev/null 2>&1 || true; fi
+    if wpctl set-volume @DEFAULT_AUDIO_SINK@ "${abs}%${op}" >/dev/null 2>&1; then return; fi
+  fi
+  if command -v pactl >/dev/null 2>&1; then
+    # pactl supports "+5%" or "-5%"; unmute when increasing
+    log_dbg "VOL using pactl: ${delta}%"
+    if [ "$op" = "+" ]; then pactl set-sink-mute @DEFAULT_SINK@ 0 >/dev/null 2>&1 || true; fi
+    if pactl set-sink-volume @DEFAULT_SINK@ "${delta}%" >/dev/null 2>&1; then return; fi
+  fi
+  if command -v amixer >/dev/null 2>&1; then
+    # amixer needs "5%+" or "5%-"
+    log_dbg "VOL using amixer: ${abs}%${op}"
+    if [ "$op" = "+" ]; then amixer set Master unmute >/dev/null 2>&1 || true; fi
+    amixer set Master "${abs}%${op}" >/dev/null 2>&1 || true
+    return
+  fi
 }
 
 read_bat() {
@@ -184,17 +220,32 @@ echo '[]'
 
 # Prime CPU stats baseline
 read_cpu >/dev/null
+ 
+# Duplicate stdin to FD 3 (i3bar sends click events on stdin)
+exec 3<&0
 
 # Click event listener (background)
 (
-  while IFS= read -r line; do
+  while IFS= read -r -u 3 line; do
     # Expect JSON objects like: {"name":"bri","button":4,...}
-    case "$line" in
-      *"name":"bri"*"button":4* )
-        adj_bri_pct +5 ;;
-      *"name":"bri"*"button":5* )
-        adj_bri_pct -5 ;;
-    esac
+    [ -n "$DEBUG_CLICK" ] && printf '%s\n' "$line" >> "$DEBUG_LOG" 2>/dev/null || true
+    # Parse name and button with sed (no external deps like jq)
+    name=$(echo "$line" | sed -n 's/.*"name":"\([^"]*\)".*/\1/p')
+    button=$(echo "$line" | sed -n 's/.*"button":\([0-9][0-9]*\).*/\1/p')
+    if [ -n "$name" ] && [ -n "$button" ]; then
+      [ -n "$DEBUG_CLICK" ] && log_dbg "CLICK parsed: name=$name button=$button"
+      if [ "$name" = "bri" ]; then
+        case "$button" in
+          4) adj_bri_pct +5 ;;
+          5) adj_bri_pct -5 ;;
+        esac
+      elif [ "$name" = "vol" ]; then
+        case "$button" in
+          4) adj_vol_pct +5 ;;
+          5) adj_vol_pct -5 ;;
+        esac
+      fi
+    fi
   done
 ) &
 

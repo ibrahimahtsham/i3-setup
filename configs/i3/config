@@ -54,7 +54,7 @@ set $sep #E95420
 
 bar {
     position top
-    status_command "/home/siamax/i3-setup/scripts/statusbar.sh"
+    status_command "env STATUSBAR_DEBUG=1 /home/siamax/i3-setup/scripts/statusbar.sh"
     tray_output primary
     font pango:monospace 10
     colors {
