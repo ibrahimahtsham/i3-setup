@@ -167,6 +167,28 @@ read_gpu() {
     busy=$(echo "$j" | sed -n 's/.*"busy":\([0-9]\+\).*/\1/p')
     [ -n "$busy" ] && echo "G: ${busy}%" && return
   fi
+  # Non-root fallback using RC6 residency deltas if exposed
+  # Logic: GPU busy% ≈ 100 - (delta_rc6_ms / delta_time_ms * 100), clamped 0..100
+  # Prefer card*/device/power/rc6_residency_ms; handle multiple connectors linking to same device
+  local rc6_path rc6_before rc6_after dt busy_est devpath
+  rc6_path=$(ls -1 /sys/class/drm/card*/device/power/rc6_residency_ms 2>/dev/null | head -n1 || true)
+  if [ -r "$rc6_path" ]; then
+    rc6_before=$(cat "$rc6_path" 2>/dev/null)
+    sleep 0.2
+    rc6_after=$(cat "$rc6_path" 2>/dev/null)
+    if [ -n "$rc6_before" ] && [ -n "$rc6_after" ]; then
+      dt=200 # ms
+      # Guard against counter wrap or clock changes
+      if [ "$rc6_after" -ge "$rc6_before" ]; then
+        local drc6=$(( rc6_after - rc6_before ))
+        if [ $drc6 -gt $dt ]; then drc6=$dt; fi
+        busy_est=$(( (100 * (dt - drc6)) / dt ))
+        if [ $busy_est -lt 0 ]; then busy_est=0; fi
+        if [ $busy_est -gt 100 ]; then busy_est=100; fi
+        echo "G: ${busy_est}%"; return
+      fi
+    fi
+  fi
   echo "G: n/a"
 }
 
