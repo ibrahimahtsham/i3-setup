@@ -2,7 +2,7 @@
 # i3blocks brightness widget: shows % and supports scroll to change
 # Uses brightnessctl if available; falls back to sysfs for read-only display
 
-ICON_SPAN="<span font='FontAwesome 9'></span>"
+ICON_SPAN="<span font='FontAwesome 13'></span>"
 STEP="5%"
 
 has_bctl=0
